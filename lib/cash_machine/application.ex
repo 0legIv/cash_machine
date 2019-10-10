@@ -6,10 +6,9 @@ defmodule CashMachine.Application do
   use Application
 
   def start(_type, _args) do
-    # List all child processes to be supervised
     children = [
-      # Starts a worker by calling: CashMachine.Worker.start_link(arg)
-      # {CashMachine.Worker, arg},
+      CashMachine.ProductsStore,
+      CashMachine.Cart
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
