@@ -20,18 +20,28 @@ defmodule CashMachine.Cart do
     GenServer.call(__MODULE__, :clean)
   end
 
+  @spec add_product(String.t()) :: :ok | :wrong_product
   def add_product(product) do
     GenServer.call(__MODULE__, {:add_product, product})
   end
 
+  @spec calculate_total(map(), map()) :: float()
   def calculate_total(cart, products_store) do
     Enum.reduce(cart, 0, fn {product, quantity}, total_price ->
-      min_quantity = products_store[product].price_rule.min_quantity
-      total_price + calculate(products_store, product, quantity, min_quantity)
+      case Map.get(products_store[product], :price_rule) do
+        nil ->
+          calculate(products_store, product, quantity, nil)
+
+        price_rule ->
+          min_quantity = Map.get(price_rule, :min_quantity, 0)
+          total_price + calculate(products_store, product, quantity, min_quantity)
+      end
     end)
   end
 
-  def calculate(products_store, product, quantity, min_quantity) when quantity >= min_quantity do
+  @spec calculate(map(), String.t(), integer(), integer()) :: float()
+  def calculate(products_store, product, quantity, min_quantity)
+      when quantity >= min_quantity and min_quantity != nil do
     price_rule = get_in(products_store, [product, :price_rule])
     product_price = get_in(products_store, [product, :price])
     items_with_discount = trunc(quantity * price_rule.products_with_discount)

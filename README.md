@@ -1,21 +1,17 @@
 # CashMachine
 
-**TODO: Add description**
+## How to run in interactive elixir:
 
-## Installation
+`mix deps.get`\
+`iex -S mix`
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `cash_machine` to your list of dependencies in `mix.exs`:
+## Tests:
 
-```elixir
-def deps do
-  [
-    {:cash_machine, "~> 0.1.0"}
-  ]
-end
-```
+`mix deps.get`\
+`mix test`
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/cash_machine](https://hexdocs.pm/cash_machine).
+## Functions:
 
+- `CashMachine.Cart.add_product` - adds product to the cart and calculates total
+- `CashMachine.Cart.get_cart` - get the current state of the cart
+- `CashMachine.Products.get_state` - get the available products

@@ -4,7 +4,9 @@ defmodule CartTest do
   alias CashMachine.Cart
   alias CashMachine.ProductsStore
 
-  @test_products ["GR1", "SR1", "CF1"]
+  @correct_amount 22.45
+
+  @test_products ["GR1", "SR1", "GR1", "GR1", "CF1"]
   @wrong_products ["WR2", "WR1", "WR3"]
 
   @test_cart1 %{"GR1" => 3, "SR1" => 1, "CF1" => 1}
@@ -14,24 +16,6 @@ defmodule CartTest do
 
   setup do
     Cart.clean()
-  end
-
-  describe "Cart state" do
-    test "add products to the cart correctly" do
-      assert Enum.all?(@test_products, fn product -> Cart.add_product(product) == :ok end)
-
-      assert Enum.all?(@test_products, fn product ->
-               Map.has_key?(Cart.get_cart()[:products], product)
-             end)
-    end
-
-    test "add products to the cart that doesn't exist" do
-      assert Enum.all?(@wrong_products, fn product ->
-               Cart.add_product(product) == :wrong_product
-             end)
-
-      assert Cart.get_cart()[:products] == %{}
-    end
   end
 
   describe "calculate/4" do
@@ -104,6 +88,40 @@ defmodule CartTest do
       products = ProductsStore.get_state()
 
       assert Cart.calculate_total(@test_cart4, products) == 30.57
+    end
+  end
+
+  describe "add_product/1" do
+    test "add products to the cart and calculate total amount" do
+      assert Enum.all?(@test_products, fn product -> Cart.add_product(product) == :ok end)
+
+      assert Enum.all?(@test_products, fn product ->
+               Map.has_key?(Cart.get_cart()[:products], product)
+             end)
+
+      assert Cart.get_cart().total == @correct_amount
+    end
+
+    test "add products to the cart together with wrong products and calculate total amount" do
+      assert Enum.all?(@test_products, fn product -> Cart.add_product(product) == :ok end)
+
+      assert Enum.all?(@wrong_products, fn product ->
+               Cart.add_product(product) == :wrong_product
+             end)
+
+      assert Enum.all?(@test_products, fn product ->
+               Map.has_key?(Cart.get_cart()[:products], product)
+             end)
+
+      assert Cart.get_cart().total == @correct_amount
+    end
+
+    test "add products to the cart that doesn't exist" do
+      assert Enum.all?(@wrong_products, fn product ->
+               Cart.add_product(product) == :wrong_product
+             end)
+
+      assert Cart.get_cart()[:products] == %{}
     end
   end
 end
